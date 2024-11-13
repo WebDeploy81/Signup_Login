@@ -1,6 +1,6 @@
 # Signup_Login
-# ---------Signup-------------
 # APIs
+# ---------Signup-------------
 /user/register<br/> 
 Method type : Post<br/> 
 Take Parameter: Json object { name (string), email(string), password(string) role (integer)}<br/> 
