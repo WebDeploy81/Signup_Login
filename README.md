@@ -8,7 +8,7 @@ Role is defined as<br/>
 1 for  Admin<br/> 
 2 for  Recruiter<br/> 
 3 for  Applicant<br/> 
-# ---------------------------
+# -----------Login----------------
 /user/login<br/> 
 Method type : Post<br/> 
 Take Parameter : Json object {email(string), password(string)}<br/> 
