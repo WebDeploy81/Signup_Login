@@ -191,7 +191,7 @@ export const loginUser=async(req,resp)=>{
     const {email,password}=req.body;
     if(!email || !password){
         return resp.status(400).json({
-            message:"Feild can not be epty",
+            message:"Feild can not be empty",
             status:400,
             success:false
         });
