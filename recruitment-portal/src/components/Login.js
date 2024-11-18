@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Login.css'; // We'll add this CSS file for styling
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
-
+    const navigate=useNavigate();
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,12 +28,35 @@ const Login = () => {
         setErrors(errors);
         return Object.keys(errors).length === 0;
     };
-
-    const handleSubmit = (event) => {
+    const handleSubmit = async(event) => {
         event.preventDefault();
         if (validateForm()) {
             console.log({ email, password });
-            alert('Login successful');
+            await fetch(`${process.env.REACT_APP_API}/user/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({email,password}),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data)
+                if (data.success) {
+                    if(data.role==1){
+                        navigate("/admin");
+                    }
+                    else if(data.role==2){
+                        navigate("/recruiter");
+                    }
+                    else if(data.role==3){
+                        navigate("/applicant");
+                    }
+                } else {
+                    alert(data.message || 'Signup failed');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
             // Insert API call here
         }
     };

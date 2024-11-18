@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Signup.css';
 
 const Signup = () =>{
@@ -8,7 +8,7 @@ const Signup = () =>{
     const [password,setPassword] = useState('');
     const [role,setRole] = useState('Applicant'); // default role
     const [errors,setErrors] = useState({}); // for storing error message
-
+    const navigate=useNavigate();
     //Regular expressions for validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
@@ -37,16 +37,37 @@ const Signup = () =>{
         return Object.keys(errors).length === 0; // return true if no errors
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async(event) => {
         event.preventDefault();
         // code to submit the form data to the backend
         console.log("hello");
         if(validateForm()){
             console.log({name,email,password,role});
-            // Insert API call here
-            alert('Signup successful');
+            const formData = {
+                name,
+                email,
+                password,
+                role
+            };
+
+            await fetch(`${process.env.REACT_APP_API}/user/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data)
+                if (data.success) {
+                    navigate("/email");
+                } else {
+                    alert(data.message || 'Signup failed');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         }
-        
     };
 
     return (
@@ -73,8 +94,11 @@ const Signup = () =>{
                     required />
                 </div>
                 <div className="form-group">
-                    <label>Role: </label>
-                    <select value ={role} 
+                    <input type='radio' name='role' value={2}  onChange = {(e)=>setRole(e.target.value)} />
+                    <label>Recruiter</label>
+                    <input type='radio' name='role' value={3}  onChange = {(e)=>setRole(e.target.value)} />
+                    <label>Applicant</label>
+                    {/* <select value ={role} 
                     onChange = {(e)=>setRole(e.target.value)} 
                     className="form-control" 
                     required>
@@ -82,7 +106,7 @@ const Signup = () =>{
                         <option value="Applicant">Applicant</option>
                         <option value="Recruiter">Recruiter</option>
                         <option value="Admin">Admin</option>
-                    </select>
+                    </select> */}
                 </div>
                 <button type="submit" className="signup-button">Create Account</button>
             </form>
