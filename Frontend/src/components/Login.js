@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css'; // We'll add this CSS file for styling
+import { API } from '../constant/constant';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ const Login = () => {
         event.preventDefault();
         if (validateForm()) {
             console.log({ email, password });
-            await fetch(`${process.env.REACT_APP_API}/user/login`, {
+            await fetch(`${API}/user/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({email,password}),
@@ -41,13 +42,13 @@ const Login = () => {
             .then((data) => {
                 console.log(data)
                 if (data.success) {
-                    if(data.role==1){
+                    if(data.role==='1'){
                         navigate("/admin");
                     }
-                    else if(data.role==2){
+                    else if(data.role==='2'){
                         navigate("/recruiter");
                     }
-                    else if(data.role==3){
+                    else if(data.role==='3'){
                         navigate("/applicant");
                     }
                 } else {

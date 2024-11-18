@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import './Signup.css';
+import { API } from '../constant/constant';
 
 const Signup = () =>{
     const [name,setName] = useState('');
@@ -50,7 +51,7 @@ const Signup = () =>{
                 role
             };
 
-            await fetch(`${process.env.REACT_APP_API}/user/register`, {
+            await fetch(`${API}/user/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
