@@ -12,7 +12,7 @@ Role is defined as<br/>
 /user/login<br/> 
 Method type : Post<br/> 
 Take Parameter : Json object {email(string), password(string)}<br/> 
-For Google Login API : /auth/google <br/>
-For Linkedin Login API : /auth/linkedin <br/>
+For Google Login API GET : /auth/google <br/>
+For Linkedin Login API GET : /auth/linkedin <br/>
 
 

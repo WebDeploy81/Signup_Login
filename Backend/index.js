@@ -6,6 +6,7 @@ import socialAuthRoute from './router/social.auth.route.js';
 import dotenv from 'dotenv'
 import connetDB from './utils/db.js';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import { configureLinkedinPassport, configurePassport } from './middlewares/passportMiddleware.js';
 dotenv.config({});
 const app=express();
@@ -16,6 +17,7 @@ const corsOption={
     Credentials:true
 };
 app.use(cors(corsOption));
+app.use(cookieParser());
 app.use(session({ secret: process.env.SERECT_KEY, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());

@@ -44,11 +44,19 @@ export const register=async(req,resp)=>{
             success:false
         });
     }
-    const usr=await User.findOne({email});
-    if(usr){
-        return resp.status(400).json({
-            message:"User Already exsist with this email",
-            status:400,
+    try {
+        const usr=await User.findOne({email});
+        if(usr){
+            return resp.status(400).json({
+                message:"User Already exsist with this email",
+                status:400,
+                success:false
+            });
+        }
+    } catch (error) {
+        return resp.status(500).json({
+            message:`Internal server Error${error}`,
+            status:500,
             success:false
         });
     }
@@ -240,7 +248,13 @@ export const loginUser=async(req,resp)=>{
 
 }
 export const logout=(req,resp)=>{
-    resp.status(200).json({
+    if(req.cookies.token){
+        return resp.status(200).cookie("token","",{maxAge:0}).json({
+            message:"Logged out successfully.",
+            success:true
+        })
+    }
+    return resp.status(200).json({
         message:'Logged out successfully',
         status:200,
         success:true
