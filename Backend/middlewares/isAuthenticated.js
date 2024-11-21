@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 const isAuthenticated=async(req,resp,next)=>{
     try {
         const token=req.headers.token;
+        // console.log(token);
         if(!token){
             return resp.status(400).json({
                 message:"Invalid token!",
