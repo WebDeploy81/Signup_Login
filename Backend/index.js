@@ -6,7 +6,7 @@ import socialAuthRoute from './router/social.auth.route.js';
 import dotenv from 'dotenv'
 import connetDB from './utils/db.js';
 import session from 'express-session';
-import { configurePassport } from './middlewares/passportMiddleware.js';
+import { configureLinkedinPassport, configurePassport } from './middlewares/passportMiddleware.js';
 dotenv.config({});
 const app=express();
 app.use(express.json());
@@ -20,6 +20,7 @@ app.use(session({ secret: process.env.SERECT_KEY, resave: false, saveUninitializ
 app.use(passport.initialize());
 app.use(passport.session());
 configurePassport(passport);
+configureLinkedinPassport(passport);
 const PORT=process.env.PORT || 8000;
 app.use("/user",userRoute)
 app.use("/auth",socialAuthRoute)
