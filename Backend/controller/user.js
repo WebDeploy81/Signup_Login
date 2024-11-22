@@ -228,7 +228,7 @@ export const loginUser=async(req,resp)=>{
             })
         }
         const token=jwt.sign({userId:user._id},process.env.SERECT_KEY,{expiresIn:'1d'});
-        const {_id,name,email,role}=user;
+        const {_id,name,role}=user;
         
         return resp.status(200).json({
             message:`Welcome ${name}`,
