@@ -65,38 +65,12 @@ const Login = () => {
     };
     // Function to handle Google Login
     const handleGoogleLogin = async () => {
-        await fetch(`${API}/auth/google`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Google login successful:', data);
-                // You can handle navigation here or any other actions
-                // For example, if login is successful, navigate to a specific route
-                if (data.success) {
-                    navigate('/dashboard'); // Replace with your route
-                } else {
-                    alert(data.message || 'Google login failed');
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        window.location.href = `${API}/auth/google`;
     };
 
     // Function to handle LinkedIn Login
     const handleLinkedinLogin = async () => {
-        await fetch(`${API}/auth/linkedin`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('LinkedIn login successful:', data);
-                if (data.success) {
-                    navigate('/dashboard'); // Replace with your route
-                } else {
-                    alert(data.message || 'LinkedIn login failed');
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        window.location.href = `${API}/auth/linkedin`;
     };
 
     // Function to handle Facebook Login

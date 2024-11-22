@@ -7,6 +7,7 @@ import RecruiterDashboard from './components/RecruiterDashboard';
 import ApplicantDashboard from './components/ApplicantDashboard';
 import AdminDashboard from './components/AdminDashboard';
 
+
 function App() {
   return (
     <Router>

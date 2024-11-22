@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { API } from '../constant/constant';
-
+import Swal from "sweetalert2";
 const Signup = () => {
 //   const [name, setName] = useState('');
     const [firstName, setFirstName] = useState(''); // Separate field for first name
     const [lastName, setLastName] = useState(''); // Separate field for last name
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('Applicant');
+    const [role, setRole] = useState(0);
     const [errors, setErrors] = useState({});
-    const navigate = useNavigate();
 
   // Regular expressions for validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -54,13 +53,21 @@ const Signup = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            navigate('/email');
+            Swal.fire("An email has been sent to register email please verify it");
           } else {
-            alert(data.message || 'Signup failed');
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: data.message,
+            });
           }
         })
         .catch((error) => {
-          console.error('Error:', error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error,
+          });
         });
     }
   };
@@ -171,8 +178,8 @@ const Signup = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        value="Recruiter"
-                        checked={role === 'Recruiter'}
+                        value="2"
+                        checked={role === '2'}
                         onChange={(e) => setRole(e.target.value)}
                       />
                       <label className="form-check-label">Recruiter</label>
@@ -182,8 +189,8 @@ const Signup = () => {
                         className="form-check-input"
                         type="radio"
                         name="role"
-                        value="Applicant"
-                        checked={role === 'Applicant'}
+                        value="3"
+                        checked={role === '3'}
                         onChange={(e) => setRole(e.target.value)}
                       />
                       <label className="form-check-label">Applicant</label>
