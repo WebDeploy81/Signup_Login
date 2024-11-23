@@ -3,12 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Login.css'; // We'll add this CSS file for styling
 import { API } from '../constant/constant';
 import { FaGoogle, FaFacebook, FaLinkedin } from 'react-icons/fa'; // Import icons
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+
     const navigate=useNavigate();
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -65,29 +69,17 @@ const Login = () => {
     };
     // Function to handle Google Login
     const handleGoogleLogin = async () => {
-        window.location.href = `${API}/auth/google`;
+        window.location.href = `${API}/auth/google`; // Direct to Google login endpoint
     };
 
     // Function to handle LinkedIn Login
     const handleLinkedinLogin = async () => {
-        window.location.href = `${API}/auth/linkedin`;
+        window.location.href = `${API}/auth/linkedin`; // Direct to Linkedin login endpoint
     };
 
     // Function to handle Facebook Login
-    const handleFacebookLogin = async () => {
-        await fetch(`${API}/auth/facebook`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Facebook login successful:', data);
-                if (data.success) {
-                    navigate('/dashboard'); // Replace with your route
-                } else {
-                    alert(data.message || 'Facebook login failed');
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+    const handleFacebookLogin = () => {
+        window.location.href = `${API}/auth/facebook`; // Direct to Facebook login endpoint
     };
 
     return (
@@ -108,19 +100,35 @@ const Login = () => {
                         />
                         {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                     </div>
+
+                    {/* Password with toggle visibility */}
                     <div className="mb-3">
                         <label htmlFor="password" className="form-label">
-                            Password<span className="text-danger">*</span>
+                            Password <span className="text-danger">*</span>
                         </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                            id="password"
-                        />
-                        {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                        <div className="input-group">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                                placeholder="Create a password"
+                            />
+                            <span
+                                className="input-group-text"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {/* {showPassword ? "🙈" : "👁️"} */}
+                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                            </span>
+                        </div>
+                        {errors.password && (
+                            <div className="invalid-feedback">{errors.password}</div>
+                        )}
                     </div>
+
                     <button type="submit" className="btn btn-primary w-100">
                         Login
                     </button>

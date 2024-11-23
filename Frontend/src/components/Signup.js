@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { API } from '../constant/constant';
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+
 const Signup = () => {
 //   const [name, setName] = useState('');
     const [firstName, setFirstName] = useState(''); // Separate field for first name
@@ -10,6 +13,8 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState(0);
     const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
   // Regular expressions for validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,25 +55,33 @@ const Signup = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            Swal.fire("An email has been sent to register email please verify it");
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: data.message,
-            });
-          }
-        })
-        .catch((error) => {
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          Swal.fire({
+            title: 'Success!',
+            text: 'An email has been sent to your registered email. Please verify it.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            // Redirect to login page after OK button click
+            navigate('/login');
+          });
+        } else {
           Swal.fire({
             icon: "error",
             title: "Oops...",
-            text: error,
+            text: data.message,
           });
+        }
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error,
         });
+      });
     }
   };
 
@@ -150,7 +163,7 @@ const Signup = () => {
                 </div>
 
                 {/* Password */}
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label htmlFor="password" className="form-label">
                     Password <span className="text-danger">*</span>
                   </label>
@@ -165,7 +178,38 @@ const Signup = () => {
                   {errors.password && (
                     <div className="invalid-feedback">{errors.password}</div>
                   )}
+                </div> */}
+
+                {/* Password with toggle visibility */}
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">
+                    Password <span className="text-danger">*</span>
+                  </label>
+                  <div className="input-group">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                      placeholder="Create a password"
+                    />
+                    <span
+                      className="input-group-text"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {/* {showPassword ? "🙈" : "👁️"} */}
+                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                    </span>
+                  
+                    {errors.password && (
+                      <div className="invalid-feedback">{errors.password}</div>
+                    )}
+                  </div>
                 </div>
+
+                
 
                 {/* Role */}
                 <div className="mb-3">
