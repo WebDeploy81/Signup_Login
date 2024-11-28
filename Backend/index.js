@@ -3,6 +3,7 @@ import cors from 'cors';
 import passport from 'passport';
 import userRoute from './router/user.route.js';
 import socialAuthRoute from './router/social.auth.route.js';
+import adminRoute from './router/admin.route.js';
 import dotenv from 'dotenv'
 import connetDB from './utils/db.js';
 import session from 'express-session';
@@ -26,6 +27,7 @@ configureLinkedinPassport(passport);
 const PORT=process.env.PORT || 8000;
 app.use("/user",userRoute)
 app.use("/auth",socialAuthRoute)
+app.use("/admin",adminRoute)
 app.listen(PORT,()=>{
     connetDB();
     console.log(`server is running on port ${PORT}`);

@@ -19,7 +19,7 @@ router.get('/callback/success' , (req , res) => {
     // console.log('Authenticated User:', req.user);
     if(!req.user)
         res.redirect('/callback/failure');
-    const token=jwt.sign({userId:req.user._id},process.env.SERECT_KEY,{expiresIn:'1d'});
+    const token=jwt.sign({userId:req.user._id,userRole:3},process.env.SERECT_KEY,{expiresIn:'1d'});
     res.cookie('token', token, { httpOnly: true, secure: true });
     res.redirect(`${process.env.CALLBACK_URL}/applicant`);
 });

@@ -15,6 +15,44 @@ export const validateRecruiterMail= (email)=>{
     return emailRegex.test(email);
 }
 
+export const generate6Otp=(length)=>{
+    if (length <= 0) {
+        throw new Error("OTP length must be greater than 0.");
+    }
+
+    const digits = '0123456789';
+    let otp = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * digits.length);
+        otp += digits[randomIndex];
+    }
+    return otp;
+}
+export const isValidMobileNumber=(mobileNumber)=>{
+    const regex = /^[0-9]{10}$/;
+    return regex.test(mobileNumber);
+}
+export const sendSMS=async(otp,mobile)=>{
+    try {
+        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+          method: 'POST',
+          headers: {
+            Authorization: process.env.FAST_SMS,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            variables_values:otp,
+            route: 'otp',
+            numbers:mobile
+          }),
+        });
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error(error);
+        return error;
+    }
+}
 export const sendMail=async(user,token)=>{
     const transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -26,7 +64,7 @@ export const sendMail=async(user,token)=>{
 
     const mailOptions = {
         from: process.env.CU_MAIL,
-        to: user.email,
+        to: user.contact,
         subject: 'Verify Your Email for Testing Platform',
         text: `Please verify your email by clicking the link: ${process.env.SERVER}/user/verify?token=${token}`
     };

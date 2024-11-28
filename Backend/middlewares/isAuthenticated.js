@@ -21,6 +21,7 @@ const isAuthenticated=async(req,resp,next)=>{
             });
         }
         req.id=decode.userId;
+        req.role=decode.userRole;
         next();
     } catch (error) {
         return resp.status(400).json({

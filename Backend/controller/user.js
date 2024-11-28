@@ -45,7 +45,7 @@ export const register=async(req,resp)=>{
         });
     }
     try {
-        const usr=await User.findOne({email});
+        const usr=await User.findOne({contact:email});
         if(usr){
             return resp.status(400).json({
                 message:"User Already exsist with this email",
@@ -70,15 +70,15 @@ export const register=async(req,resp)=>{
         const hashpassword=await bcrypt.hash(password,10);
         const user=new User({
             name ,
-            email,
+            contact:email,
             password:hashpassword,
             role,
         });
         const token=jwt.sign({userId:user._id},process.env.SERECT_KEY,{expiresIn:'1d'});
         //save user here
-        user.save();
         try {
             await sendMail(user,token);
+            user.save();
             return resp.status(200).json({
                 message:`Verification link has been sent to ${email}`,
                 status:200,
@@ -205,7 +205,7 @@ export const loginUser=async(req,resp)=>{
         });
     }
     try {
-        const user=await User.findOne({email}).lean();
+        const user=await User.findOne({contact:email}).lean();
         if(!user){
             return resp.status(400).json({
                 message:"Account does not exsist",
@@ -227,7 +227,7 @@ export const loginUser=async(req,resp)=>{
                 success:false
             })
         }
-        const token=jwt.sign({userId:user._id},process.env.SERECT_KEY,{expiresIn:'1d'});
+        const token=await jwt.sign({userId:user._id,userRole:user.role},process.env.SERECT_KEY,{expiresIn:'1d'});
         const {_id,name,role}=user;
         
         return resp.status(200).json({
@@ -241,8 +241,10 @@ export const loginUser=async(req,resp)=>{
             success:true
         });
     } catch (error) {
+        console.error("Error occurred:", error);
         return resp.status(500).json({
             message:"Server Error",
+            error,
             success:false
         });
     }
