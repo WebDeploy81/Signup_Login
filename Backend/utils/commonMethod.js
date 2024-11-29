@@ -1,6 +1,6 @@
 
 import nodemailer from "nodemailer";
-
+import  Twilio from "twilio";
 export const validatePassword=(password)=>{
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*_?&])[A-Za-z\d@$!%*_?&]{8,}$/;
     return passwordRegex.test(password);
@@ -34,23 +34,28 @@ export const isValidMobileNumber=(mobileNumber)=>{
 }
 export const sendSMS=async(otp,mobile)=>{
     try {
-        const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-          method: 'POST',
-          headers: {
-            Authorization: process.env.FAST_SMS,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            variables_values:otp,
-            route: 'otp',
-            numbers:mobile
-          }),
+        const client = new Twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+        const response=await client.messages
+        .create({
+            body: `OTP for Account login is ${otp} and it is valid for 5 minutes`,
+            from: process.env.PHONE_FOR_TWILIO,
+            to: `+91${mobile}`
         });
-        const data = await response.json();
-        return data;
+        // const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        //   method: 'POST',
+        //   headers: {
+        //     Authorization: process.env.FAST_SMS,
+        //     'Content-Type': 'application/x-www-form-urlencoded',
+        //   },
+        //   body: new URLSearchParams({
+        //     variables_values:otp,
+        //     route: 'otp',
+        //     numbers:mobile
+        //   }),
+        // });
+        return response;
       } catch (error) {
-        console.error(error);
-        return error;
+            return error.message
     }
 }
 export const sendMail=async(user,token)=>{
