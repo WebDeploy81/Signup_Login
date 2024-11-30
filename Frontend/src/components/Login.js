@@ -13,6 +13,7 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
 
+
     const navigate=useNavigate();
     // Regular expression for email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,7 +47,8 @@ const Login = () => {
             })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data)
+                console.log(data);
+                window.localStorage.setItem('token',data.token);
                 if (data.success) {
                     if(data.role==='1'){
                         navigate("/admin");
@@ -67,6 +69,12 @@ const Login = () => {
             // Insert API call here
         }
     };
+
+    // Navigate to OTP Login
+    const handleOtpLogin = () => {
+        navigate('/otp_login'); // Route to the new OTP_Login.js page
+    };
+
     // Function to handle Google Login
     const handleGoogleLogin = async () => {
         window.location.href = `${API}/auth/google`; // Direct to Google login endpoint
@@ -77,10 +85,10 @@ const Login = () => {
         window.location.href = `${API}/auth/linkedin`; // Direct to Linkedin login endpoint
     };
 
-    // Function to handle Facebook Login
-    const handleFacebookLogin = () => {
-        window.location.href = `${API}/auth/facebook`; // Direct to Facebook login endpoint
-    };
+    // // Function to handle Facebook Login
+    // const handleFacebookLogin = () => {
+    //     window.location.href = `${API}/auth/facebook`; // Direct to Facebook login endpoint
+    // };
 
     return (
         <div className="container vh-100 d-flex justify-content-center align-items-center">
@@ -133,7 +141,7 @@ const Login = () => {
                         Login
                     </button>
                 </form>
-                {/* "OR" Divider */}
+                
                  {/* "OR" Section */}
                  {/* <div className="text-center my-1">
                     <p>OR</p>
@@ -144,6 +152,8 @@ const Login = () => {
                         Login with Google
                     </button>
                 </div> */}
+
+                {/* "OR" Divider */}
                 <div className="text-center my-4">
                     <div className="d-flex align-items-center">
                         <hr className="flex-grow-1 custom-hr" />
@@ -151,6 +161,23 @@ const Login = () => {
                         <hr className="flex-grow-1 custom-hr" />
                     </div>
                 </div>
+
+                {/* New Mobile Login Button */}
+                <div className="text-center ">
+                    <button className="btn btn-outline-success w-100 mb-3" onClick={handleOtpLogin}>
+                        Sign in with Mobile Number
+                    </button>
+                </div>
+
+                {/* "OR" Divider */}
+                <div className="text-center ">
+                    <div className="d-flex align-items-center">
+                        <hr className="flex-grow-1 custom-hr" />
+                        <span className="mx-3 text-muted fancy-or">OR</span>
+                        <hr className="flex-grow-1 custom-hr" />
+                    </div>
+                </div>
+
                 <div className="text-center mt-1">
                     {/* <p>OR</p> */}
                     <p>You can sign in with:</p>
@@ -161,9 +188,9 @@ const Login = () => {
                         <button className="btn btn-outline-primary" onClick={handleLinkedinLogin}>
                             <FaLinkedin size={20}/> 
                         </button>
-                        <button className="btn btn-outline-primary" onClick={handleFacebookLogin}>
+                        {/* <button className="btn btn-outline-primary" onClick={handleFacebookLogin}>
                             <FaFacebook size={20}/> 
-                        </button>
+                        </button> */}
                     </div>
                 </div>
 

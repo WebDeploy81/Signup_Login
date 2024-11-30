@@ -6,7 +6,7 @@ import EmailSent from './components/EmailSent';
 import RecruiterDashboard from './components/RecruiterDashboard';
 import ApplicantDashboard from './components/ApplicantDashboard';
 import AdminDashboard from './components/AdminDashboard';
-
+import OTP_Login from './components/OTP_Login';
 
 function App() {
   return (
@@ -20,6 +20,7 @@ function App() {
         <Route path = "/recruiter" element={<RecruiterDashboard/>} />
         <Route path = "/applicant" element={<ApplicantDashboard/>} />
         <Route path = "/admin" element={<AdminDashboard/>} />
+        <Route path = "/otp_login" element={<OTP_Login />} />
       </Routes>
     </Router>
   );

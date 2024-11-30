@@ -1,4 +1,4 @@
-/* Signup.css */
+/* Signup.css
 
 .signup-container {
     width: 100%;
@@ -59,3 +59,72 @@
 .signup-button:hover {
     background-color: #45a049;
 }
+ */
+
+/* IMPORTANT */
+/* .hover-card {
+    position: absolute;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    top: 100%;  */
+    /* Position below the input field */
+    /* left: 0;
+    z-index: 1000;
+    display: none;  */
+    /* Initially hidden */
+  /* }
+  
+  .input-group:hover + .hover-card { */
+    /* display: block;*/ /* Show card on hover */
+  /* }
+  
+  .hover-card ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .hover-card li {
+    margin-bottom: 5px;
+    font-size: 14px;
+  }  */
+  
+
+  .hover-card {
+    position: absolute;
+    top: 100%; /* Place below the input field */
+    left: 0;
+    z-index: 10;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .hover-card span {
+    font-size: 0.9rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hover-card span.green {
+    color: green;
+  }
+  
+  .hover-card span.red {
+    color: red;
+  }
+  
+  .hover-card span .icon {
+    margin-right: 5px;
+  }
+  
