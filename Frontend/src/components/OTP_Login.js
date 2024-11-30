@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { API } from '../constant/constant';
 
 const OTP_Login = () => {
-    const [mobileNumber, setMobileNumber] = useState('');
+    const [mobile, setmobile] = useState('');
     const [otp, setOtp] = useState('');
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -10,19 +10,20 @@ const OTP_Login = () => {
 
     // Function to send OTP
     const handleSendOtp = async () => {
-        if (!mobileNumber || mobileNumber.length !== 10) {
+        if (!mobile || mobile.length !== 10) {
             setErrorMessage('Please enter a valid 10-digit mobile number');
             return;
         }
 
         try {
-            const response = await fetch(`${API}/send-otp`, {
+            console.log(mobile);
+            const response = await fetch(`${API}/user/otpSend`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mobileNumber }),
+                body: JSON.stringify({ mobile }),
             });
-            const data = await response.json();
-
+            const data =await response.json();
+            
             if (response.ok) {
                 setIsOtpSent(true);
                 setSuccessMessage('OTP sent successfully. Please check your mobile.');
@@ -44,10 +45,10 @@ const OTP_Login = () => {
         }
 
         try {
-            const response = await fetch(`${API}/verify-otp`, {
+            const response = await fetch(`${API}/user/otpVerify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ mobileNumber, otp }),
+                body: JSON.stringify({ mobile, otp }),
             });
             const data = await response.json();
 
@@ -75,15 +76,15 @@ const OTP_Login = () => {
                     <div className="alert alert-danger text-center">{errorMessage}</div>
                 )}
                 <div className="mb-3">
-                    <label htmlFor="mobileNumber" className="form-label">
+                    <label htmlFor="mobile" className="form-label">
                         Mobile Number
                     </label>
                     <input
                         type="text"
-                        value={mobileNumber}
-                        onChange={(e) => setMobileNumber(e.target.value)}
+                        value={mobile}
+                        onChange={(e) => setmobile(e.target.value)}
                         className="form-control"
-                        id="mobileNumber"
+                        id="mobile"
                         placeholder="Enter your mobile number"
                         disabled={isOtpSent}
                     />
