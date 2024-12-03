@@ -314,6 +314,7 @@ const Signup = () => {
                         value="2"
                         checked={role === '2'}
                         onChange={(e) => setRole(e.target.value)}
+                        style={{border:'1px solid black'}}
                       />
                       <label className="form-check-label">Recruiter</label>
                     </div>
@@ -325,6 +326,7 @@ const Signup = () => {
                         value="3"
                         checked={role === '3'}
                         onChange={(e) => setRole(e.target.value)}
+                        style={{border:'1px solid black'}}
                       />
                       <label className="form-check-label">Applicant</label>
                     </div>

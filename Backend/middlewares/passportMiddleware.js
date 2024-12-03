@@ -49,7 +49,7 @@ export const configureLinkedinPassport = (passport) => {
         clientSecret: process.env.LINKDIN_CLIENT_SECRATE,
         callbackURL: `${process.env.SERVER}/auth/linkedin/callback`,
         scope: ['openid', 'profile', 'email'],
-        state: true
+        state: false
       },
       async(accessToken, refreshToken, profile, done)=>{
         const email=profile.email;

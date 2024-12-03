@@ -23,7 +23,7 @@ export const register=async(req,resp)=>{
         //this role for recruiter
         if(!validateRecruiterMail(email)){
             return resp.status(400).json({
-                message:`Invalid email! Please use a ${process.env.CU_DOMAIN} domain.`,
+                message:`Invalid email! Please use work mail.`,
                 status:400,
                 success:false
             })
