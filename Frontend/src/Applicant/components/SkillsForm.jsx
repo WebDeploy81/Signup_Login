@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {API} from '../../constant/constant';
+import { API_URL } from "../config";
 import axios from "axios";
 import {
   TextField,
@@ -8,8 +8,10 @@ import {
   Chip,
   Autocomplete,
   Box,
-  Card
+  Card,
 } from "@mui/material";
+
+import { skillSuggestions } from "./data";
 
 const SkillsForm = ({ onNext, data }) => {
   const [skills, setSkills] = useState({
@@ -20,56 +22,7 @@ const SkillsForm = ({ onNext, data }) => {
     hardSkillYears: "",
     softSkillYears: "",
   });
-
-  const skillSuggestions = [
-    "JavaScript",
-    "HTML",
-    "CSS",
-    "React.js",
-    "Node.js",
-    "Java",
-    "Python",
-    "SQL",
-    "TypeScript",
-    "MongoDB",
-    "Git",
-    "Docker",
-    "GraphQL",
-    "AWS",
-    "Azure",
-    "DevOps",
-    "Android",
-    "Swift",
-    "Ruby",
-    "C#",
-    "Go",
-    "PHP",
-    "C++",
-    "Kotlin",
-    "Scala",
-    "Rust",
-    "Flutter",
-    "Vue.js",
-    "Angular",
-    "Express.js",
-    "Laravel",
-    "Team Lead", // Example of a soft skill
-    "Communication", // Soft Skills
-    "Problem Solving",
-    "Time Management",
-    "Leadership",
-    "Teamwork",
-    "Adaptability",
-    "Creativity",
-    "Collaboration",
-    "Critical Thinking",
-    "Decision Making",
-    "Conflict Resolution",
-    "Public Speaking",
-    "Emotional Intelligence",
-    "Work Ethic",
-  ];
-
+  const [location, setLocation] = useState("");
 
   const handleAddSkill = (skillType, skill, years) => {
     if (
@@ -117,13 +70,17 @@ const SkillsForm = ({ onNext, data }) => {
       alert("Please add at least one hard skill and one soft skill.");
       return;
     }
-    onNext({ hardSkills: skills.hardSkills, softSkills: skills.softSkills });
+    onNext({
+      hardSkills: skills.hardSkills,
+      softSkills: skills.softSkills,
+      JobLocation: location,
+    });
 
     // Add skills to the API
+    const token = localStorage.getItem('token');
+
     const addSkills = async (skillsData) => {
-      const url = API;
-      const token = localStorage.getItem('token');;
-      const api = await axios.post(`${url}/skills/add`, skillsData, {
+      const api = await axios.post(`${API_URL}/skills/add`, skillsData, {
         headers: {
           "Content-Type": "application/json",
           token: token,
@@ -131,15 +88,15 @@ const SkillsForm = ({ onNext, data }) => {
         withCredentials: true,
       });
       alert(api.data.message);
-      console.log("at the skills ",api.data)
+      console.log("at the skills ", api.data);
     };
 
     addSkills({ hardSkills: skills.hardSkills, softSkills: skills.softSkills });
   };
 
   return (
-    <Box sx={{ maxWidth: 750, mx: "auto", mt: 5, }}>
-      <Card sx={{p:2}}>
+    <Box sx={{ maxWidth: 750, mx: "auto", mt: 5 }}>
+      <Card sx={{ p: 2 }}>
         <form onSubmit={handleSubmit}>
           <h1>Skills</h1>
 

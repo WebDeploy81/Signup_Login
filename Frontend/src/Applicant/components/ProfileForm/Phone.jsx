@@ -11,49 +11,28 @@ import {
   InputAdornment,
 } from "@mui/material";
 import Flag from "react-world-flags"; // Import react-world-flags
+import axios from "axios";
 
-// List of countries with codes and flags
-const countryList = [
-  { code: "IN", country: "India", phoneCode: "+91" },
-  { code: "US", country: "United States", phoneCode: "+1" },
-  { code: "CA", country: "Canada", phoneCode: "+1" },
-  { code: "GB", country: "United Kingdom", phoneCode: "+44" },
-  { code: "AU", country: "Australia", phoneCode: "+61" },
-  { code: "DE", country: "Germany", phoneCode: "+49" },
-  // Add more countries as needed
-];
+import {countryList} from './data'
 
-// Utility function to validate phone number based on country code
-const validatePhoneNumber = (phone, country) => {
-  const phoneNumber = phone.replace(/\D/g, ""); // Remove non-digit characters
+import { API_KEY_PHONE } from "../../config";
 
-  // Example validation logic for length based on country (India: 10 digits, USA: 10 digits, etc.)
-  if (country === "IN" && phoneNumber.length === 10) {
-    return true;
-  } else if (country === "US" && phoneNumber.length === 10) {
-    return true;
-  }
-
-  return false;
-};
 
 const PhoneVerification = ({ phone, setPhone }) => {
-  //   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("IN"); // Default country set to India
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [apiResult, setApiResult] = useState(null); // Store the API result
+
+  // const apiKey = API_KEY_PHONE; // Replace with your API key
+  const apiKey = "1006d309da81cbacedbe666762292439"; // Replace with your API key
 
   // Handle phone input change
   const handlePhoneChange = (e) => {
     const value = e.target.value;
     setPhone(value);
     setHasInteracted(true);
-
-    // Validate phone number as the user types
-    const valid = validatePhoneNumber(value, country);
-    setIsValid(valid);
-    setErrorMessage(valid ? "" : "Invalid phone number format.");
   };
 
   // Handle country change
@@ -62,14 +41,48 @@ const PhoneVerification = ({ phone, setPhone }) => {
     setHasInteracted(true);
   };
 
+  // Validate phone number using numverify API
+  const validatePhoneNumber = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
+    if (!phone || !country) {
+      setErrorMessage("Phone number and country code are required.");
+      setIsValid(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get("http://apilayer.net/api/validate", {
+        params: {
+          access_key: apiKey,
+          number: phone,
+          country_code: country,
+        },
+      });
+
+      const result = response.data;
+
+      if (result.valid) {
+        setIsValid(true);
+        setErrorMessage("");
+        setApiResult(result); // Store the validation result
+      } else {
+        setIsValid(false);
+        setErrorMessage("Invalid phone number format.");
+        setApiResult(null);
+      }
+    } catch (error) {
+      setIsValid(false);
+      setErrorMessage("Error validating phone number. Please try again.");
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center" }}>
       <Paper
         sx={{
           width: "100%",
-          //   maxWidth: "500px",
           p: 1,
-          //   boxShadow: 1,
           borderRadius: 1,
           bgcolor: "background.paper",
         }}
@@ -83,14 +96,12 @@ const PhoneVerification = ({ phone, setPhone }) => {
             label="Country"
             fullWidth
             sx={{
-              //   padding: "12px 15px",
               borderRadius: "8px",
               backgroundColor: "#fafafa",
             }}
           >
             {countryList.map((item) => (
               <MenuItem key={item.code} value={item.code}>
-                {/* Displaying flag with country name and phone code */}
                 <Flag
                   code={item.code}
                   style={{ width: 24, height: 18, marginRight: 8 }}
@@ -109,12 +120,9 @@ const PhoneVerification = ({ phone, setPhone }) => {
           fullWidth
           margin="normal"
           variant="outlined"
-          error={!isValid}
-          helperText={!isValid && "Invalid phone number format"}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                {/* Displaying selected country's flag and phone code */}
                 <Flag
                   code={country}
                   style={{ width: 24, height: 18, marginRight: 8 }}
@@ -129,22 +137,40 @@ const PhoneVerification = ({ phone, setPhone }) => {
               borderRadius: "8px",
             },
             backgroundColor: "#fafafa",
-            "& .Mui-error": {
-              borderColor: "#f44336",
-            },
           }}
         />
 
+        {/* Validate Button */}
+        <Box sx={{ mt: 2, textAlign: "center" }}>
+          <button
+            type="button" // Set the button type to "button"
+            onClick={validatePhoneNumber}
+            style={{
+              padding: "10px 15px",
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: "5px",
+            }}
+          >
+            Validate
+          </button>
+        </Box>
+
         {/* Display error or success messages */}
-        {hasInteracted && !isValid && (
+        {hasInteracted && !isValid && errorMessage && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {errorMessage}
           </Alert>
         )}
 
-        {hasInteracted && isValid && phone && (
+        {isValid && apiResult && (
           <Alert severity="success" sx={{ mt: 2 }}>
-            Phone number is valid!
+            Phone number is valid! <br />
+            Carrier: {apiResult.carrier || "N/A"} <br />
+            Location: {apiResult.location || "N/A"} <br />
+            Line Type: {apiResult.line_type || "N/A"}
           </Alert>
         )}
       </Paper>

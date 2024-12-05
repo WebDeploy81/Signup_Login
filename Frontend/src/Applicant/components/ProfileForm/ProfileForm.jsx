@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {API} from '../../../constant/constant';
+import { API_URL } from "../../config";
 import {
   TextField,
   Button,
@@ -17,7 +17,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import axios from "axios";
 
-const ProfileForm = ({ onNext, data = {} }) => {
+const ProfileForm = ({ onNext, data ={}  }) => {
+
+  console.log("data ata profile = ",data)
   const [firstName, setFirstName] = useState(data.firstName || "");
   const [lastName, setLastName] = useState(data.lastName || "");
   const [email, setEmail] = useState(data.email || "");
@@ -35,12 +37,14 @@ const ProfileForm = ({ onNext, data = {} }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false); // Toggle visibility
 
+  const [showPic, setshowPic] = useState("")
+
   // Cleanup for profile picture
   useEffect(() => {
     return () => {
-      if (profilePicture) URL.revokeObjectURL(profilePicture);
+      if (showPic) URL.revokeObjectURL(showPic);
     };
-  }, [profilePicture]);
+  }, [showPic]);
 
   // Function to validate the phone number
   const validatePhoneNumber = (value) => {
@@ -74,32 +78,76 @@ const ProfileForm = ({ onNext, data = {} }) => {
   };
 
   // Profile api connection
-  const url = API;
-  const token = localStorage.getItem('token');;
-  const addProfile = async (
-    firstName,
-    lastName,
-    email,
-    phone,
-    location,
-    profilePicture,
-    password
-  ) => {
-    const api = await axios.post(
-      `${url}/profile/create`,
-      { firstName, lastName, email, phone, location, profilePicture, password },
-      {
+  // const url = "http://localhost:5000";
+  const token = localStorage.getItem('token');
+ const addProfile = async (
+   firstName,
+   lastName,
+   email,
+   phone,
+   location,
+   profilePicture,
+   password
+ ) => {
+   try {
+     const api = await axios.post(
+       `${API_URL}/profile/create`,
+       {
+         firstName,
+         lastName,
+         email,
+         phone,
+         location,
+         profilePicture,
+         password,
+       },
+       {
+         headers: {
+           "Content-Type": "application/json",
+          //  email: token,
+         },
+         withCredentials: true,
+       }
+     );
+     console.log(api.data);
+     alert(api.data.message); // Success message
+   } catch (error) {
+     console.error("Error creating profile:", error.response?.data || error);
+     alert(
+       error.response?.data?.message || "An error occurred. Please try again."
+     ); // Backend error message
+   }
+ };
+
+
+
+  // file upload
+  const addPic = async (file) => {
+    if (!file) {
+      alert("Please select a file before uploading.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("profilePic", file);
+
+      const api = await axios.post(`${data.url}/file/upload-profile-pic`, formData, {
         headers: {
-          "Content-Type": "application/json",
-          token: token,
+          "Content-Type": "multipart/form-data",
+          email: token,
         },
         withCredentials: true,
-      }
-    );
-    console.log(api.data);
+      });
 
-    alert(api.data.message);
+      // console.log(api.data);
+      alert(api.data.message);
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("Failed to upload profile picture. Please try again.");
+    }
   };
+
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -115,6 +163,7 @@ const ProfileForm = ({ onNext, data = {} }) => {
         password,
       });
 
+      // data submit - api
       addProfile(
         firstName,
         lastName,
@@ -124,6 +173,9 @@ const ProfileForm = ({ onNext, data = {} }) => {
         profilePicture,
         password
       );
+
+      // file upload - api
+      addPic(profilePicture)
     }
 
     console.log(
@@ -141,10 +193,12 @@ const ProfileForm = ({ onNext, data = {} }) => {
   // Handle profile picture change
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
+    
     if (file) {
-      setProfilePicture(URL.createObjectURL(file));
-      setErrors((prev) => ({ ...prev, profilePicture: null }));
+      setshowPic(URL.createObjectURL(file));
+      setErrors((prev) => ({ ...prev, showPic: null }));
     }
+    setProfilePicture(file)
   };
 
   // Handle password change and strength update
@@ -163,6 +217,8 @@ const ProfileForm = ({ onNext, data = {} }) => {
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = (event) => event.preventDefault();
+
+  // console.log("profile pic = ",profilePicture)
 
   return (
     <Box sx={{ marginTop: 5 }}>
@@ -250,7 +306,7 @@ const ProfileForm = ({ onNext, data = {} }) => {
             {profilePicture && (
               <Box sx={{ marginTop: 2, textAlign: "center" }}>
                 <Avatar
-                  src={profilePicture}
+                  src={showPic}
                   alt="Profile Preview"
                   sx={{ width: 100, height: 100, margin: "0 auto" }}
                 />

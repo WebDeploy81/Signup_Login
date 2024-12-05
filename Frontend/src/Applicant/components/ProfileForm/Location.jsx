@@ -1,171 +1,123 @@
-import React, { useState } from "react";
-import {
-  TextField,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Grid,
-  Box,
-  Typography,
-} from "@mui/material";
-
-// Location data (countries, states, and cities)
-const locationData = {
-  India: {
-    Andhra_Pradesh: ["Visakhapatnam", "Vijayawada", "Guntur"],
-    Arunachal_Pradesh: ["Itanagar", "Tawang", "Pasighat"],
-    Assam: ["Guwahati", "Dibrugarh", "Silchar"],
-    Bihar: ["Patna", "Gaya", "Bhagalpur"],
-    Chhattisgarh: ["Raipur", "Bilaspur", "Durg"],
-    Goa: ["Panaji", "Margao", "Mapusa"],
-    Gujarat: ["Ahmedabad", "Surat", "Vadodara"],
-    Haryana: ["Gurgaon", "Faridabad", "Panipat"],
-    Himachal_Pradesh: ["Shimla", "Manali", "Dharamshala"],
-    Jharkhand: ["Ranchi", "Jamshedpur", "Dhanbad"],
-    Karnataka: ["Bangalore", "Mysore", "Mangalore"],
-    Kerala: ["Thiruvananthapuram", "Kochi", "Kozhikode"],
-    Madhya_Pradesh: ["Bhopal", "Indore", "Gwalior"],
-    Maharashtra: ["Mumbai", "Pune", "Nagpur"],
-    Manipur: ["Imphal", "Churachandpur", "Bishnupur"],
-    Meghalaya: ["Shillong", "Tura", "Jowai"],
-    Mizoram: ["Aizawl", "Lunglei", "Champhai"],
-    Nagaland: ["Kohima", "Dimapur", "Mokokchung"],
-    Odisha: ["Bhubaneswar", "Cuttack", "Rourkela"],
-    Punjab: ["Chandigarh", "Ludhiana", "Amritsar"],
-    Rajasthan: ["Jaipur", "Udaipur", "Jodhpur"],
-    Sikkim: ["Gangtok", "Namchi", "Gyalshing"],
-    Tamil_Nadu: ["Chennai", "Coimbatore", "Madurai"],
-    Telangana: ["Hyderabad", "Warangal", "Nizamabad"],
-    Tripura: ["Agartala", "Udaipur", "Dharmanagar"],
-    Uttar_Pradesh: ["Lucknow", "Kanpur", "Varanasi"],
-    Uttarakhand: ["Dehradun", "Haridwar", "Nainital"],
-    West_Bengal: ["Kolkata", "Darjeeling", "Asansol"],
-  },
-  USA: {
-    California: ["Los Angeles", "San Francisco", "San Diego"],
-    Texas: ["Houston", "Dallas", "Austin"],
-    Florida: ["Miami", "Orlando", "Tampa"],
-  },
-  Australia: {
-    Victoria: ["Melbourne", "Geelong", "Ballarat"],
-    Queensland: ["Brisbane", "Gold Coast", "Cairns"],
-    New_South_Wales: ["Sydney", "Newcastle", "Wollongong"],
-  },
-  Canada: {
-    Ontario: ["Toronto", "Ottawa", "Hamilton"],
-    Quebec: ["Montreal", "Quebec City", "Laval"],
-    Alberta: ["Calgary", "Edmonton", "Red Deer"],
-  },
-  Germany: {
-    Bavaria: ["Munich", "Nuremberg", "Augsburg"],
-    Berlin: ["Berlin City"],
-    Hesse: ["Frankfurt", "Wiesbaden", "Darmstadt"],
-  },
-  United_Kingdom: {
-    England: ["London", "Manchester", "Liverpool"],
-    Scotland: ["Edinburgh", "Glasgow", "Aberdeen"],
-    Wales: ["Cardiff", "Swansea", "Newport"],
-  },
-  France: {
-    Ile_de_France: ["Paris", "Versailles"],
-    Provence: ["Marseille", "Nice", "Avignon"],
-    Normandy: ["Rouen", "Caen", "Le Havre"],
-  },
-  Japan: {
-    Tokyo: ["Tokyo City", "Shibuya", "Shinjuku"],
-    Osaka: ["Osaka City", "Sakai", "Higashiosaka"],
-    Hokkaido: ["Sapporo", "Hakodate", "Asahikawa"],
-  },
-  China: {
-    Beijing: ["Beijing City", "Haidian", "Chaoyang"],
-    Shanghai: ["Shanghai City", "Pudong", "Huangpu"],
-    Guangdong: ["Guangzhou", "Shenzhen", "Foshan"],
-  },
-  Brazil: {
-    São_Paulo: ["São Paulo City", "Campinas", "Santos"],
-    Rio_de_Janeiro: ["Rio City", "Niterói", "Nova Iguaçu"],
-    Bahia: ["Salvador", "Feira de Santana", "Vitória da Conquista"],
-  },
-};
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Box, TextField, Typography } from "@mui/material";
+import Autocomplete from "@mui/lab/Autocomplete";
 
 const LocationSelector = ({ location, setLocation }) => {
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const { country, state, city } = location;
+
+  // Fetch all countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(
+          "https://countriesnow.space/api/v0.1/countries"
+        );
+        setCountries(response.data.data);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  // Fetch states when country is selected
+  const fetchStates = async (country) => {
+    try {
+      const response = await axios.post(
+        "https://countriesnow.space/api/v0.1/countries/states",
+        { country }
+      );
+      setStates(response.data.data.states || []);
+      setCities([]);
+      setLocation({ country, state: "", city: "" });
+    } catch (error) {
+      console.error("Error fetching states:", error);
+    }
+  };
+
+  // Fetch cities when state is selected
+  const fetchCities = async (state) => {
+    try {
+      const response = await axios.post(
+        "https://countriesnow.space/api/v0.1/countries/state/cities",
+        { country, state }
+      );
+      setCities(response.data.data || []);
+      setLocation({ ...location, state, city: "" });
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
+
   const handleChange = (level, value) => {
     if (level === "country") {
       setLocation({ country: value, state: "", city: "" });
+      fetchStates(value);
     } else if (level === "state") {
       setLocation({ ...location, state: value, city: "" });
+      fetchCities(value);
     } else if (level === "city") {
       setLocation({ ...location, city: value });
     }
   };
 
-  const { country, state, city } = location;
-
   return (
     <Box sx={{ width: "100%", display: "flex", justifyContent: "center" }}>
-      <Box sx={{ width: "100%", }}>
+      <Box sx={{ width: "100%" }}>
         <Box sx={{ marginBottom: 2 }}>
-          <FormControl fullWidth variant="outlined">
-            <InputLabel>Select Country</InputLabel>
-            <Select
-              label="Select Country"
-              value={country}
-              onChange={(e) => handleChange("country", e.target.value)}
-            >
-              <MenuItem value="">
-                <em>-- Select Country --</em>
-              </MenuItem>
-              {Object.keys(locationData).map((country) => (
-                <MenuItem key={country} value={country}>
-                  {country.replace(/_/g, " ")}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Autocomplete
+            options={countries.map((country) => country.country)}
+            value={country}
+            onChange={(e, value) => handleChange("country", value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Select Country"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
         </Box>
 
         {country && (
           <Box sx={{ marginBottom: 2 }}>
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Select State</InputLabel>
-              <Select
-                label="Select State"
-                value={state}
-                onChange={(e) => handleChange("state", e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>-- Select State --</em>
-                </MenuItem>
-                {Object.keys(locationData[country] || {}).map((state) => (
-                  <MenuItem key={state} value={state}>
-                    {state.replace(/_/g, " ")}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              options={states.map((state) => state.name)}
+              value={state}
+              onChange={(e, value) => handleChange("state", value)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select State"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
           </Box>
         )}
 
         {state && (
           <Box sx={{ marginBottom: 2 }}>
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Select City</InputLabel>
-              <Select
-                label="Select City"
-                value={city}
-                onChange={(e) => handleChange("city", e.target.value)}
-              >
-                <MenuItem value="">
-                  <em>-- Select City --</em>
-                </MenuItem>
-                {(locationData[country]?.[state] || []).map((city) => (
-                  <MenuItem key={city} value={city}>
-                    {city}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Autocomplete
+              options={cities}
+              value={city}
+              onChange={(e, value) => handleChange("city", value)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select City"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
           </Box>
         )}
 
@@ -179,8 +131,7 @@ const LocationSelector = ({ location, setLocation }) => {
             }}
           >
             <Typography variant="body1">
-              Selected Location: {city}, {state.replace(/_/g, " ")},{" "}
-              {country.replace(/_/g, " ")}
+              Selected Location: {city}, {state}, {country}
             </Typography>
           </Box>
         )}

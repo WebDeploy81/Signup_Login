@@ -9,6 +9,7 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import axios from "axios";
 import ProfileForm from "./components/ProfileForm/ProfileForm";
 import EducationForm from "./components/EducationForm";
 import WorkExperienceForm from "./components/WorkExperienceForm";
@@ -33,6 +34,12 @@ import Reference from "./components/Reference";
 // import { ToastContainer } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 
+import PhoneValidator from "./components/Phone_Validate";
+
+import ShowApplicant_data from "./components/ShowApplicat_data";
+import { API_URL, API_KEY_PHONE} from './config'
+import { API } from "../constant/constant";
+
 const steps = [
   { label: "Personal Info", component: ProfileForm },
   { label: "Education", component: EducationForm },
@@ -55,8 +62,13 @@ const steps = [
 ];
 
 const Applicant = () => {
+  const url = API;
+
+    console.log("API URL:", API_URL);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    url,
     name: "",
     email: "",
     phone: "",
@@ -79,6 +91,7 @@ const Applicant = () => {
   });
   const [isPreview, setIsPreview] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [applicant_data, setapplicant_data] = useState([]);
 
   const handleNextStep = (newData) => {
     setFormData((prevData) => ({ ...prevData, ...newData }));
@@ -94,8 +107,34 @@ const Applicant = () => {
   };
 
   const handleSubmit = () => {
+    // Profile api connection
+    // const url = "http://localhost:5000";
+    const token = localStorage.getItem('token');
+    const getProfile = async () => {
+      try {
+        const api = await axios.get(`${url}/applicant_data/view`, {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+          withCredentials: true,
+        });
+        setapplicant_data(api.data.Applicant_data);
+        console.log("fetching profile data ", api.data);
+        alert(api.data.message); // Success message
+      } catch (error) {
+        console.error("Error fetching profile:", error.response?.data || error);
+        alert(
+          error.response?.data?.message ||
+            "An error occurred. Please try again."
+        ); // Backend error message
+      }
+    };
+    getProfile();
     setIsSubmitted(true);
   };
+
+  console.log("fetching profile data - state ", applicant_data);
 
   const handleEditStep = (stepIndex) => {
     setCurrentStep(stepIndex);
@@ -140,7 +179,6 @@ const Applicant = () => {
       </Typography>
 
       <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-
         {/* <Stepper activeStep={currentStep} alternativeLabel>
           {steps.map((step, index) => (
             <Step key={index}>
@@ -153,7 +191,6 @@ const Applicant = () => {
             </Step>
           ))}
         </Stepper> */}
-
 
         <ProgressIndicator
           steps={steps.map((step) => step.label)}
@@ -189,15 +226,15 @@ const Applicant = () => {
       </Paper>
 
       {isSubmitted && (
-
-
         <Box sx={{ mt: 5 }}>
           <Typography variant="h5" align="center">
             Your profile has been submitted successfully!
+            <ShowApplicant_data data={applicant_data} />
           </Typography>
         </Box>
-        
       )}
+
+      {/* <PhoneValidator /> */}
     </Container>
   );
 };

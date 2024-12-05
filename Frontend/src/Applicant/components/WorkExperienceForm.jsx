@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {API} from '../../constant/constant';
+import { API_URL } from "../config";
 import {
   Box,
   Card,
@@ -10,11 +10,13 @@ import {
   Grid,
   MenuItem,
   Chip,
+  Container
 } from "@mui/material";
 
 import axios from "axios";
 
-
+import Location from './ProfileForm/Location'
+import ProjectDetailsForm from "./Projects";
 
 const WorkExperienceForm = ({ data, onNext }) => {
   const [experiences, setExperiences] = useState(data?.experiences || []);
@@ -31,6 +33,24 @@ const WorkExperienceForm = ({ data, onNext }) => {
   
   const [skills, setSkills] = useState("");
   const [skillList, setSkillList] = useState([]);
+
+const [formData, setFormData] = useState({
+  projectTitle: data.projectTitle || "",
+  objective: data.objective || "",
+  toolsTechnologies: data.toolsTechnologies || "",
+  duration: data.duration || "",
+  outcome: data.outcome || "",
+  url: data.url || "",
+});
+
+
+ const handleInputChange = (e) => {
+   const { name, value } = e.target;
+   setFormData((prevData) => ({
+     ...prevData,
+     [name]: value,
+   }));
+ };
   
   const maxSkillsAllowed = 30;
 
@@ -51,21 +71,31 @@ const WorkExperienceForm = ({ data, onNext }) => {
   ];
 
   const calculateDuration = (start, end) => {
-    const startDate = new Date(start);
-    const endDate = end ? new Date(end) : new Date();
-    const diffYears = endDate.getFullYear() - startDate.getFullYear();
-    const diffMonths = endDate.getMonth() - startDate.getMonth();
-    const totalMonths = diffYears * 12 + diffMonths;
-    const years = Math.floor(totalMonths / 12);
-    const months = totalMonths % 12;
-    return { years, months };
-  };
+      const startDate = new Date(start);
+      const endDate = end ? new Date(end) : new Date();
 
-  const getTotalSkills = () => {
-    return experiences.reduce(
-      (total, exp) => total + exp.skills.split(",").length,
-      0
-    );
+      const diffYears = endDate.getFullYear() - startDate.getFullYear();
+      const diffMonths = endDate.getMonth() - startDate.getMonth();
+      const diffDays = endDate.getDate() - startDate.getDate();
+
+      let totalMonths = diffYears * 12 + diffMonths;
+      let totalDays = diffDays;
+
+      if (totalDays < 0) {
+        // Borrow days from the previous month
+        const previousMonth = new Date(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          0
+        );
+        totalDays += previousMonth.getDate();
+        totalMonths -= 1;
+      }
+
+      const years = Math.floor(totalMonths / 12);
+      const months = totalMonths % 12;
+
+      return { years, months, days: totalDays };
   };
 
   const handleAddExperience = () => {
@@ -80,16 +110,7 @@ const WorkExperienceForm = ({ data, onNext }) => {
       return;
     }
 
-    const currentSkillsCount = skills.split(",").length;
-    const totalSkills = getTotalSkills() + currentSkillsCount;
-
-    if (totalSkills > maxSkillsAllowed) {
-      alert(
-        `Skill limit exceeded. You can only add up to ${maxSkillsAllowed} skills across all experiences.`
-      );
-      return;
-    }
-
+    
     const newExperience = {
       jobTitle,
       company,
@@ -125,15 +146,23 @@ const WorkExperienceForm = ({ data, onNext }) => {
     setInternshipType("Unpaid");
     setInternshipAmount("");
     setReadyToRelocate(false);
+    setFormData({
+      projectTitle: "",
+      objective:  "",
+      toolsTechnologies:  "",
+      duration: "",
+      outcome: "",
+      url: "",
+    });
   };
 
   // work Experience api connection
-  const url = API;
-  const token = localStorage.getItem('token');;
-  const addWorkExperience = async (WorkExperience) => {
+    const token = localStorage.getItem('token');
+
+  const addWorkExperience = async (experiences, projects) => {
     const api = await axios.post(
-      `${url}/experience/add`,
-      { WorkExperience },
+      `${API_URL}/experience/add`,
+      { experiences: experiences, projects: formData },
       {
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +179,7 @@ const WorkExperienceForm = ({ data, onNext }) => {
   const handleNext = () => {
     if (onNext) {
       onNext(experiences);
-      addWorkExperience(experiences)
+      addWorkExperience(experiences, formData)
       console.log("at the add work experienc = ",experiences)
     } else {
       alert("Proceeding to the next step...");
@@ -158,19 +187,28 @@ const WorkExperienceForm = ({ data, onNext }) => {
   };
 
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && skills.trim()) {
-      e.preventDefault();
+const handleKeyPress = (e) => {
+  if (e.key === "Enter" && skills.trim()) {
+    e.preventDefault(); // Prevent form submission
 
-      if (skillList.length >= 30) {
-        alert("You can only add up to 30 skills.");
-        return;
-      }
-
-      setSkills("");
-      setSkillList([...skillList, skills.trim()]);
+    if (skillList.length >= 30) {
+      alert("You can only add up to 30 skills.");
+      return;
     }
-  };
+
+    const newSkill = skills.trim();
+
+    if (skillList.includes(newSkill)) {
+      alert(`The skill "${newSkill}" is already added.`);
+      setSkills(""); // Clear the input field
+      return;
+    }
+
+    setSkillList([...skillList, newSkill]);
+    setSkills(""); // Clear the input field
+  }
+};
+
 
   const handleDeleteSkill = (skillToDelete) => {
     setSkillList(skillList.filter((skill) => skill !== skillToDelete));
@@ -223,11 +261,12 @@ const WorkExperienceForm = ({ data, onNext }) => {
               <Grid item xs={6}>
                 <TextField
                   type="date"
-                  label="End Date (Optional)"
+                  label="End Date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
+                  required
                 />
               </Grid>
               <Grid item xs={12}>
@@ -251,6 +290,27 @@ const WorkExperienceForm = ({ data, onNext }) => {
                   onChange={(e) => setSkills(e.target.value)}
                   onKeyPress={handleKeyPress}
                   fullWidth
+                />
+                <div style={{ marginTop: "10px" }}>
+                  {skillList.map((skill, index) => (
+                    <Chip
+                      key={index}
+                      label={skill}
+                      onDelete={() => handleDeleteSkill(skill)}
+                      color="primary"
+                      style={{ marginRight: "5px", marginBottom: "5px" }}
+                    />
+                  ))}
+                </div>
+              </Grid>
+
+              {/* <Grid item xs={12}>
+                <TextField
+                  label="Add Skill"
+                  value={skills}
+                  onChange={(e) => setSkills(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  fullWidth
                   InputProps={{
                     startAdornment: skills
                       .split(",")
@@ -267,7 +327,9 @@ const WorkExperienceForm = ({ data, onNext }) => {
                       ),
                   }}
                 />
-              </Grid>
+              </Grid> */}
+
+              {/*               
               <Grid item xs={12}>
                 <Grid container spacing={1}>
                   {skillList.map((skill, index) => (
@@ -281,7 +343,7 @@ const WorkExperienceForm = ({ data, onNext }) => {
                     </Grid>
                   ))}
                 </Grid>
-              </Grid>
+              </Grid> */}
 
               {/* <Grid item xs={12}>
                 <TextField
@@ -294,13 +356,100 @@ const WorkExperienceForm = ({ data, onNext }) => {
               </Grid> */}
 
               <Grid item xs={12}>
-                <TextField
-                  label="Location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  fullWidth
-                />
+                <Location location={location} setLocation={setLocation} />
               </Grid>
+
+              {/* Projects */}
+              {/* <ProjectDetailsForm /> */}
+             
+                <Card sx={{ p: 2 }}>
+                  {/* <Typography
+                    variant="h4"
+                    component="h2"
+                    align="center"
+                    color="primary"
+                    gutterBottom
+                  >
+                    Project Details
+                  </Typography> */}
+                  <form >
+                    <Grid container spacing={3}>
+                      {[
+                        {
+                          label: "Project Title",
+                          name: "projectTitle",
+                          placeholder: "Enter the project title...",
+                        },
+                        {
+                          label: "Objective",
+                          name: "objective",
+                          placeholder: "What was the objective of the project?",
+                        },
+                        {
+                          label: "Tools and Technologies Used",
+                          name: "toolsTechnologies",
+                          placeholder:
+                            "List the tools and technologies used...",
+                        },
+                        {
+                          label: "Duration",
+                          name: "duration",
+                          placeholder: "Enter the duration (e.g., 3 months)...",
+                        },
+                        {
+                          label: "Outcome/Results",
+                          name: "outcome",
+                          placeholder:
+                            "Describe the outcome or results achieved...",
+                        },
+                        {
+                          label: "URL",
+                          name: "url",
+                          placeholder: "Enter the project URL (if any)...",
+                        },
+                      ].map(({ label, name, placeholder }) => (
+                        <Grid item xs={12} key={name}>
+                          <TextField
+                            fullWidth
+                            label={label}
+                            name={name}
+                            placeholder={placeholder}
+                            variant="outlined"
+                            value={formData[name]}
+                            onChange={handleInputChange}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mt: 3,
+                      }}
+                    >
+                      {/* <Button
+                        type="button"
+                        onClick={handleSkip}
+                        variant="contained"
+                        color="secondary"
+                        sx={{ flex: 1, mr: 1 }}
+                      >
+                        Skip
+                      </Button> */}
+                      {/* <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        sx={{ flex: 1, ml: 1 }}
+                      >
+                        Next
+                      </Button> */}
+                    </Box>
+                  </form>
+                </Card>
+        
+
               <Grid item xs={6}>
                 <TextField
                   select
@@ -375,7 +524,8 @@ const WorkExperienceForm = ({ data, onNext }) => {
                       {calculateDuration(exp.startDate, exp.endDate).years}{" "}
                       years,{" "}
                       {calculateDuration(exp.startDate, exp.endDate).months}{" "}
-                      months
+                      months,{" "}
+                      {calculateDuration(exp.startDate, exp.endDate).days} days
                     </Typography>
                     <Typography variant="body2">
                       {exp.keyResponsibilities}

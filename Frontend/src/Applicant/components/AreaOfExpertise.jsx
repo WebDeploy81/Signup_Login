@@ -45,7 +45,7 @@ const SpecializedFieldsForm = ({ onNext, data }) => {
 
   // Area_of_Expertise api connection
   const url = API;
-  const token = localStorage.getItem('token');;
+  const token = localStorage.getItem('token');
   const addArea_of_Expertise = async (Area_of_Expertise) => {
     const api = await axios.post(
       `${url}/experties_area/update`,

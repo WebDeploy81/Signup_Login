@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -15,11 +16,11 @@ const CVUpload = ({ onNext, data }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState(""); // For displaying error messages
-
-  const handleFileChange = (e) => {
+  const token=localStorage.getItem('token');
+  const handleFileChange = async(e) => {
     const file = e.target.files[0];
 
-    // Check if file is either PDF or DOCX
+    // Validate file type
     if (
       file &&
       (file.type === "application/pdf" ||
@@ -27,25 +28,48 @@ const CVUpload = ({ onNext, data }) => {
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     ) {
       setCv(file);
-      setErrorMessage(""); // Clear any previous error message
+      setErrorMessage(""); // Clear previous error messages
 
-      // Simulate file upload progress
-      setUploading(true);
-      let progress = 0;
-
-      const interval = setInterval(() => {
-        if (progress < 100) {
-          progress += 10;
-          setUploadProgress(progress);
-        } else {
-          clearInterval(interval);
-          setUploading(false);
-          onNext({ cv: file }); // Pass the uploaded file to parent
-        }
-      }, 500);
+      // Upload file
+      await uploadCV(file);
     } else {
       setCv(null);
       setErrorMessage("Please upload a valid file (PDF or DOCX).");
+    }
+  };
+
+  const uploadCV = async (file) => {
+    try {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append("cv", file);
+
+      const response = await axios.post(`${data.url}/file/upload-cv`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          token: token,
+        },
+        withCredentials: true,
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
+        },
+      });
+
+      console.log(response.data);
+      alert(response.data.message); // Success message
+      onNext({ cv: file }); // Pass the uploaded file to parent
+    } catch (error) {
+      console.error("Error uploading CV:", error.response?.data || error);
+      setErrorMessage(
+        error.response?.data?.message ||
+          "Failed to upload CV. Please try again."
+      );
+    } finally {
+      setUploading(false);
+      setUploadProgress(0); // Reset progress bar
     }
   };
 

@@ -1,25 +1,21 @@
 import React, { useState } from "react";
-import { institutions } from "./data";
-import {API} from '../../constant/constant';
-import axios from "axios";
 import {
   TextField,
-  MenuItem,
   FormControl,
-  InputLabel,
-  Select,
   FormControlLabel,
   Checkbox,
   Button,
-  Grid,
   Typography,
-  Radio,
   RadioGroup,
+  Radio,
   FormLabel,
-  Paper,
   Box,
+  Paper,
+  Autocomplete,
 } from "@mui/material";
-
+import axios from "axios";
+import { institutions, degrees, specializations } from "./data";
+import {API} from '../../constant/constant';
 const EducationForm = ({ onNext, data }) => {
   const initialEducationState = {
     level: "",
@@ -35,24 +31,6 @@ const EducationForm = ({ onNext, data }) => {
     isPursuing: false,
   };
 
-  const degrees = {
-    UG: ["BCA", "BSc", "BTech"],
-    PG: ["MTech", "MCA", "MCS"],
-  };
-
-  const specializations = {
-    UG: {
-      BCA: ["IT", "CS", "Maths"],
-      BSc: ["IT", "Physics", "Chemistry", "Maths"],
-      BTech: ["IT", "CS", "Mechanical", "ECE", "Civil"],
-    },
-    PG: {
-      MTech: ["IT", "CS", "Mechanical", "ECE", "Civil"],
-      MCA: ["IT", "CS", "Software Engineering"],
-      MCS: ["CS", "Data Science", "AI"],
-    },
-  };
-
   const [educationDetails, setEducationDetails] = useState(
     data.educationDetails || [
       { ...initialEducationState, level: "10th" },
@@ -62,8 +40,6 @@ const EducationForm = ({ onNext, data }) => {
       { ...initialEducationState, level: "PhD" },
     ]
   );
-  const url = API;
-  const token = localStorage.getItem('token');;
 
   const handleChange = (index, field, value) => {
     const updatedEducationDetails = [...educationDetails];
@@ -76,65 +52,27 @@ const EducationForm = ({ onNext, data }) => {
     updatedEducationDetails[index].certificate = file;
     setEducationDetails(updatedEducationDetails);
   };
+  const token = localStorage.getItem('token');
 
-  // Education form API connection
-  const addEducation = async (educationDetails) => {
-    const api = await axios.post(
-      `${url}/education/add`,
-      { educationDetails },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          token: token,
-        },
-        withCredentials: true,
-      }
-    );
-    console.log(api.data);
-    alert(api.data.message);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    for (const detail of educationDetails) {
-      if (!detail.institution) {
-        alert(`Please enter the institution for ${detail.level}.`);
-        return;
-      }
-      if (
-        detail.gradingSystem === "cgpa" &&
-        (detail.cgpa === "" || detail.cgpa < 0 || detail.cgpa > 10)
-      ) {
-        alert(`Please enter a valid CGPA (0-10) for ${detail.level}.`);
-        return;
-      }
-      if (
-        detail.gradingSystem === "percentage" &&
-        (detail.percentage === "" ||
-          detail.percentage < 0 ||
-          detail.percentage > 100)
-      ) {
-        alert(`Please enter a valid Percentage (0-100) for ${detail.level}.`);
-        return;
-      }
-      if (detail.level === "PhD" && !detail.certificate) {
-        alert("Please upload your PhD certificate.");
-        return;
-      }
-      // Validate end date > start date
-      if (
-        detail.endDate &&
-        new Date(detail.endDate) < new Date(detail.startDate)
-      ) {
-        alert(
-          `End date for ${detail.level} cannot be earlier than start date.`
-        );
-        return;
-      }
+    try {
+      const response = await axios.post(
+        `${API}/education/add`,
+        { educationDetails },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+      alert(response.data.message);
+      onNext({ educationDetails });
+    } catch (error) {
+      console.error(error);
+      alert("Error submitting the form. Please try again.");
     }
-    onNext({ educationDetails });
-    addEducation(educationDetails);
-    console.log("at the education form components ...", educationDetails);
   };
 
   return (
@@ -164,72 +102,53 @@ const EducationForm = ({ onNext, data }) => {
                 {edu.level} Details
               </Typography>
 
-              {/* Institution */}
+              {/* Institution Autocomplete */}
               <FormControl fullWidth margin="normal">
-                <InputLabel>Institution</InputLabel>
-                <Select
+                <Autocomplete
                   value={edu.institution}
-                  onChange={(e) =>
-                    handleChange(index, "institution", e.target.value)
+                  onInputChange={(e, newInputValue) =>
+                    handleChange(index, "institution", newInputValue)
                   }
-                  label="Institution"
-                  required
-                >
-                  <MenuItem value="">Select Institution</MenuItem>
-                  {institutions[edu.level]?.map((inst, i) => (
-                    <MenuItem key={i} value={inst}>
-                      {inst}
-                    </MenuItem>
-                  ))}
-                </Select>
+                  options={institutions[edu.level] || []}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Institution" required />
+                  )}
+                  freeSolo
+                />
               </FormControl>
 
-              {/* Degree selection for UG/PG */}
+              {/* Degree Autocomplete */}
               {(edu.level === "UG" || edu.level === "PG") && (
-                <>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel>Degree</InputLabel>
-                    <Select
-                      value={edu.degree}
-                      onChange={(e) =>
-                        handleChange(index, "degree", e.target.value)
-                      }
-                      label="Degree"
-                      required
-                    >
-                      <MenuItem value="">Select Degree</MenuItem>
-                      {degrees[edu.level]?.map((degree, i) => (
-                        <MenuItem key={i} value={degree}>
-                          {degree}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                <FormControl fullWidth margin="normal">
+                  <Autocomplete
+                    value={edu.degree}
+                    onInputChange={(e, newInputValue) =>
+                      handleChange(index, "degree", newInputValue)
+                    }
+                    options={degrees[edu.level] || []}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Degree" required />
+                    )}
+                    freeSolo
+                  />
+                </FormControl>
+              )}
 
-                  {/* Specialization selection */}
-                  {edu.degree && specializations[edu.level][edu.degree] && (
-                    <FormControl fullWidth margin="normal">
-                      <InputLabel>Specialization</InputLabel>
-                      <Select
-                        value={edu.specialization}
-                        onChange={(e) =>
-                          handleChange(index, "specialization", e.target.value)
-                        }
-                        label="Specialization"
-                        required
-                      >
-                        <MenuItem value="">Select Specialization</MenuItem>
-                        {specializations[edu.level][edu.degree].map(
-                          (spec, i) => (
-                            <MenuItem key={i} value={spec}>
-                              {spec}
-                            </MenuItem>
-                          )
-                        )}
-                      </Select>
-                    </FormControl>
-                  )}
-                </>
+              {/* Specialization Autocomplete */}
+              {edu.degree && (
+                <FormControl fullWidth margin="normal">
+                  <Autocomplete
+                    value={edu.specialization}
+                    onInputChange={(e, newInputValue) =>
+                      handleChange(index, "specialization", newInputValue)
+                    }
+                    options={specializations[edu.level]?.[edu.degree] || []}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Specialization" required />
+                    )}
+                    freeSolo
+                  />
+                </FormControl>
               )}
 
               {/* Start Date */}
@@ -250,7 +169,7 @@ const EducationForm = ({ onNext, data }) => {
 
               {/* End Date / Currently Pursuing */}
               <TextField
-                label="End Date / Currently Pursuing"
+                label="End Date"
                 type="date"
                 fullWidth
                 value={edu.isPursuing ? "" : edu.endDate}
@@ -331,37 +250,11 @@ const EducationForm = ({ onNext, data }) => {
                   }}
                 />
               )}
-
-              {/* File Upload */}
-              {edu.level === "PhD" && (
-                <Box sx={{ marginTop: 2 }}>
-                  <Typography variant="body1" color="primary" gutterBottom>
-                    Upload Certificate
-                  </Typography>
-                  <input
-                    type="file"
-                    onChange={(e) => handleFileChange(index, e.target.files[0])}
-                    accept="application/pdf"
-                  />
-                </Box>
-              )}
             </Box>
           ))}
-
-          {/* Submit Button */}
-          <Grid container justifyContent="center">
-            <Grid item xs={12} sm={6} md={4}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
-              >
-                Submit Education Details
-              </Button>
-            </Grid>
-          </Grid>
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Next
+          </Button>
         </form>
       </Paper>
     </Box>
