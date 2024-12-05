@@ -105,6 +105,7 @@ const Login = () => {
                             onChange={(e) => setEmail(e.target.value)}
                             className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                             id="email"
+                            placeholder='Enter username'
                         />
                         {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                     </div>
@@ -121,7 +122,7 @@ const Login = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className={`form-control ${errors.password ? "is-invalid" : ""}`}
-                                placeholder="Create a password"
+                                placeholder="Enter password"
                             />
                             <span
                                 className="input-group-text"

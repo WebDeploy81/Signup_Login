@@ -4,10 +4,9 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailSent from './components/EmailSent';
 import RecruiterDashboard from './components/RecruiterDashboard';
-import ApplicantDashboard from './components/ApplicantDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import OTP_Login from './components/OTP_Login';
-
+import Applicant from './Applicant/Applicant';
 function App() {
   return (
     <Router>
@@ -18,7 +17,7 @@ function App() {
         <Route path = "/signup" element={<Signup />} />
         <Route path = "/email" element={<EmailSent/>} />
         <Route path = "/recruiter" element={<RecruiterDashboard/>} />
-        <Route path = "/applicant" element={<ApplicantDashboard/>} />
+        <Route path = "/applicant" element={<Applicant/>}/>
         <Route path = "/admin" element={<AdminDashboard/>} />
         <Route path = "/otp_login" element={<OTP_Login />} />
       </Routes>
