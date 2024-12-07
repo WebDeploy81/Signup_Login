@@ -11,7 +11,7 @@ const validateSkillType = (type) => {
 // View Skills
 const viewSkills = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
         if (!applicant) return res.status(404).json({ error: 'Applicant not found' });
 
@@ -24,7 +24,7 @@ const viewSkills = async (req, res) => {
 // Add Skill
 // const addSkill = async (req, res) => {
 //     try {
-//         const email = req.email;
+//         const email = req.headers.email || req.headers.mobile;
 //         const { type, name, yearsOfExperience } = req.body;
 
 //         validateSkillType(type);
@@ -48,7 +48,7 @@ const viewSkills = async (req, res) => {
 // Add Skills
 const addSkill = async (req, res) => {
   try {
-    const email = req.email;
+    const email = req.headers.email || req.headers.mobile;
     const { hardSkills, softSkills } = req.body;
 
     const update = {};
@@ -82,7 +82,7 @@ const addSkill = async (req, res) => {
 // Update Skill
 const updateSkill = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const { type, skillId, name, yearsOfExperience } = req.body;
 
         validateSkillType(type);
@@ -104,7 +104,7 @@ const updateSkill = async (req, res) => {
 // Delete Skill
 const deleteSkill = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const { type, skillId } = req.body;
 
         validateSkillType(type);

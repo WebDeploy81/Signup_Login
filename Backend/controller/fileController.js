@@ -6,7 +6,7 @@ const uploadCv = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const cvUrl = req.file.path;
 
         // Update CV URL in MongoDB
@@ -33,7 +33,7 @@ const uploadProfilePic = async (req, res) => {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const profilePicUrl = req.file.path;
 
         // Update Profile Picture URL in MongoDB
@@ -55,7 +55,7 @@ const uploadProfilePic = async (req, res) => {
 
 const viewCv = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
@@ -75,7 +75,7 @@ const viewCv = async (req, res) => {
 
 const viewProfilePic = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });

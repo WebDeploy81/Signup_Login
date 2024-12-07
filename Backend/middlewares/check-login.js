@@ -7,7 +7,7 @@ const check_login = (req, res, next) => {
     }
 
     // Attach the validated email to the request object
-    req.email = email;
+    req.headers.email || req.headers.mobile = email;
     next();
 };
 

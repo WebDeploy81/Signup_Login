@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewProject = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.project || applicant.project.length === 0) {
@@ -23,7 +23,7 @@ const viewProject = async (req, res) => {
  */
 const uploadProject = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

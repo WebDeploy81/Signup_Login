@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewExperience = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -26,7 +26,7 @@ const viewExperience = async (req, res) => {
  */
 const addExperience = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -49,7 +49,7 @@ const addExperience = async (req, res) => {
  */
 const updateExperience = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -85,7 +85,7 @@ const updateExperience = async (req, res) => {
  */
 const deleteExperience = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }

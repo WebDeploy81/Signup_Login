@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewLanguage = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.language || applicant.language.length === 0) {
@@ -23,7 +23,7 @@ const viewLanguage = async (req, res) => {
  */
 const uploadLanguage = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

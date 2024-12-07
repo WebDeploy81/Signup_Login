@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewResearch_publication = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.research_publication || applicant.research_publication.length === 0) {
@@ -23,7 +23,7 @@ const viewResearch_publication = async (req, res) => {
  */
 const uploadResearch_publication = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

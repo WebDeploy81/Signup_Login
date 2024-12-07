@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewExperties_area = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.experties_area || applicant.experties_area.length === 0) {
@@ -23,7 +23,7 @@ const viewExperties_area = async (req, res) => {
  */
 const uploadExperties_area = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

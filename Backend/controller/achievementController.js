@@ -5,7 +5,8 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewAchievement = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
+        console.log(email);
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.achievement || applicant.achievement.length === 0) {
@@ -23,9 +24,7 @@ const viewAchievement = async (req, res) => {
  */
 const uploadAchievement = async (req, res) => {
     try {
-        const email = req.email;
-
-
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOneAndUpdate(
             { email },
             { $push: { achievement:  req.body  } },

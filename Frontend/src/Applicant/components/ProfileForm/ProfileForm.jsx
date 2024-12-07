@@ -104,7 +104,9 @@ const ProfileForm = ({ onNext, data ={}  }) => {
        {
          headers: {
            "Content-Type": "application/json",
-          //  email: token,
+           token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
          },
          withCredentials: true,
        }
@@ -135,7 +137,9 @@ const ProfileForm = ({ onNext, data ={}  }) => {
       const api = await axios.post(`${data.url}/file/upload-profile-pic`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          email: token,
+          token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
         },
         withCredentials: true,
       });

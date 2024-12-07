@@ -83,7 +83,9 @@ const SkillsForm = ({ onNext, data }) => {
       const api = await axios.post(`${API_URL}/skills/add`, skillsData, {
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
         },
         withCredentials: true,
       });

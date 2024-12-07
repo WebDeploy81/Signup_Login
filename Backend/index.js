@@ -83,24 +83,24 @@ app.use("/auth",socialAuthRoute)
 app.use("/admin",adminRoute)
 // Applicant API server.js route
 app.use('/profile', profileRoutes);
-app.use('/personal',isAuthenticated, personalRoutes)
-app.use('/skills',isAuthenticated, skillsRoutes);
-app.use('/education',isAuthenticated, educationRoutes);
-app.use('/experience',isAuthenticated, experienceRoutes);
-app.use('/file',isAuthenticated, file);
-app.use('/certificate',isAuthenticated, certificates);
-app.use('/activity', isAuthenticated, activity);
-app.use('/achievement', isAuthenticated, achievement);
-app.use('/project', isAuthenticated, project);
-app.use('/research_publication', isAuthenticated, research_publication);
-app.use('/conferences_seminars', isAuthenticated, conferences_seminars);
-app.use('/domain_intrest', isAuthenticated, domain_intreast);
-app.use('/experties_area', isAuthenticated, experties_area);
-app.use('/language', isAuthenticated, language);
-app.use('/patent', isAuthenticated, patent);
-app.use('/profile_summery', isAuthenticated, profile_summery);
-app.use('/hobbie', isAuthenticated, hobbieRoutes);
-app.use('/reference', isAuthenticated, referenceRouter);
+app.use('/personal', personalRoutes)
+app.use('/skills', skillsRoutes);
+app.use('/education', educationRoutes);
+app.use('/experience', experienceRoutes);
+app.use('/file', file);
+app.use('/certificate', certificates);
+app.use('/activity', activity);
+app.use('/achievement', achievement);
+app.use('/project', project);
+app.use('/research_publication', research_publication);
+app.use('/conferences_seminars', conferences_seminars);
+app.use('/domain_intrest', domain_intreast);
+app.use('/experties_area', experties_area);
+app.use('/language', language);
+app.use('/patent', patent);
+app.use('/profile_summery', profile_summery);
+app.use('/hobbie', hobbieRoutes);
+app.use('/reference', referenceRouter);
 const PORT=process.env.PORT || 8000;
 app.listen(PORT,()=>{
     connetDB();

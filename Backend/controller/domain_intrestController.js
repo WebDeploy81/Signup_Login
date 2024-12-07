@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewDomain_intrest = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.domain_intrest || applicant.domain_intrest.length === 0) {
@@ -23,7 +23,7 @@ const viewDomain_intrest = async (req, res) => {
  */
 const uploadDomain_intrest = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

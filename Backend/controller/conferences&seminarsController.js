@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewConferences_seminars = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.conferences_seminars || applicant.conferences_seminars.length === 0) {
@@ -23,7 +23,7 @@ const viewConferences_seminars = async (req, res) => {
  */
 const uploadConferences_seminars = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

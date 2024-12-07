@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewProfile_summery = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.profile_summery || applicant.profile_summery.length === 0) {
@@ -23,7 +23,7 @@ const viewProfile_summery = async (req, res) => {
  */
 const uploadProfile_summery = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

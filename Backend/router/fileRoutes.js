@@ -3,12 +3,13 @@ const router=express.Router();
 import {fileUpload} from '../controller/fileController.js';
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 // const fileUpload = require('../controller/fileController');
+import isAuthenticated from '../middlewares/isAuthenticated.js';
 import { uploadProfilePic, uploadCv, multerErrorHandler } from '../middlewares/fileUpload.js';
 // View CV
-router.get('/view-cv',roleMiddleware([1,3]), fileUpload.viewCv);
+router.get('/view-cv',isAuthenticated,roleMiddleware([1,3]), fileUpload.viewCv);
 
 // View Profile Picture
-router.get('/view-profile-pic',roleMiddleware([1,3]), fileUpload.viewProfilePic);
+router.get('/view-profile-pic',isAuthenticated,roleMiddleware([1,3]), fileUpload.viewProfilePic);
 
 // Upload CV
 router.post('/upload-cv', (req, res, next) => {

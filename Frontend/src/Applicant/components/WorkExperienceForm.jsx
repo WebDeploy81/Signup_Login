@@ -166,7 +166,9 @@ const [formData, setFormData] = useState({
       {
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
         },
         withCredentials: true,
       }

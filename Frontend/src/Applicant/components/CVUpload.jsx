@@ -47,7 +47,9 @@ const CVUpload = ({ onNext, data }) => {
       const response = await axios.post(`${data.url}/file/upload-cv`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          token: token,
+          token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
         },
         withCredentials: true,
         onUploadProgress: (progressEvent) => {

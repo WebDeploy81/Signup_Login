@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewEducation = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -26,7 +26,8 @@ const viewEducation = async (req, res) => {
  */
 const addEducation = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
+        console.log(email);
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -57,7 +58,7 @@ const addEducation = async (req, res) => {
  */
 const editEducation = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -96,7 +97,7 @@ const editEducation = async (req, res) => {
  */
 const updateEducationBulk = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }
@@ -133,7 +134,7 @@ const updateEducationBulk = async (req, res) => {
  */
 const deleteEducationBulk = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         if (!email) {
             return res.status(400).json({ message: 'Email header is required' });
         }

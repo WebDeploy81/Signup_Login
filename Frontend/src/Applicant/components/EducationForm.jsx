@@ -36,8 +36,8 @@ const EducationForm = ({ onNext, data }) => {
       { ...initialEducationState, level: "10th" },
       { ...initialEducationState, level: "12th" },
       { ...initialEducationState, level: "UG" },
-      { ...initialEducationState, level: "PG" },
-      { ...initialEducationState, level: "PhD" },
+      // { ...initialEducationState, level: "PG" },
+      // { ...initialEducationState, level: "PhD" },
     ]
   );
 
@@ -63,7 +63,9 @@ const EducationForm = ({ onNext, data }) => {
         {
           headers: {
             "Content-Type": "application/json",
-            token: token,
+            token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
           },
         }
       );

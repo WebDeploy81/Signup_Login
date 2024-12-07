@@ -115,7 +115,9 @@ const Applicant = () => {
         const api = await axios.get(`${url}/applicant_data/view`, {
           headers: {
             "Content-Type": "application/json",
-            token: token,
+            token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
           },
           withCredentials: true,
         });

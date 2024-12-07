@@ -5,7 +5,7 @@ import {Applicant} from '../modals/applicant.js';
  */
 const viewPatent = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const applicant = await Applicant.findOne({ email });
 
         if (!applicant || !applicant.patent || applicant.patent.length === 0) {
@@ -23,7 +23,7 @@ const viewPatent = async (req, res) => {
  */
 const uploadPatent = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
 
 
         const applicant = await Applicant.findOneAndUpdate(

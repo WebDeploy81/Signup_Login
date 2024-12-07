@@ -39,7 +39,9 @@ const ProjectDetailsForm = ({ onNext, data }) => {
       {
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          token:token,
+						email:localStorage.getItem('email'),
+						mobile:localStorage.getItem('mobile'),
         },
         withCredentials: true,
       }

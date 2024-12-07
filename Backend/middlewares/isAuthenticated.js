@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 const isAuthenticated=async(req,resp,next)=>{
     try {
+        // console.log("I am under authentication")
         const token=req.headers.token || req.cookies.token;
         // console.log(token);
         if(!token){
@@ -20,6 +21,7 @@ const isAuthenticated=async(req,resp,next)=>{
                 success:false
             });
         }
+        // console.log(decode);
         req.id=decode.userId;
         req.role=decode.userRole;
         next();

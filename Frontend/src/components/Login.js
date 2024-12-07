@@ -49,6 +49,8 @@ const Login = () => {
             .then((data) => {
                 console.log(data);
                 window.localStorage.setItem('token',data.token);
+                localStorage.setItem('email',data.email);
+                localStorage.setItem('mobile',data.mobile);
                 if (data.success) {
                     if(data.role==='1'){
                         navigate("/admin");

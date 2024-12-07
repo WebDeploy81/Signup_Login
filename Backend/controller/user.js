@@ -226,7 +226,7 @@ export const loginUser=async(req,resp)=>{
                 status:400,
                 success:false
             })
-        }
+        } 
         const token=await jwt.sign({userId:user._id,userRole:user.role},process.env.SERECT_KEY,{expiresIn:'1d'});
         const {_id,name,role}=user;
         

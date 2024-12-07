@@ -3,15 +3,16 @@ import { Applicant } from "../modals/applicant.js";
 
 const createProfile = async (req, res) => {
 
-    console.log("body = ",req.body)
+    // console.log("body = ",req.body)
     try {
         const {email} = req.body;
         let profile = await Applicant.findOne({ email });
         if (profile) {
+            console.log("I am under profile condition")
             return res.status(400).json({ message: 'Profile already exists' });
         } else {
             profile = await Applicant.create(req.body);
-           
+            console.log("creating a new profile")
             return res.json({message:"profile craeted successfully",profile, success:true})
         }
     } catch (error) {

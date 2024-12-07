@@ -3,7 +3,7 @@ import {Applicant} from '../modals/applicant.js';
 // View Personal Information
 const viewPersonal = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         let applicant = await Applicant.findOne({ email });
 
         if (!applicant) {
@@ -25,7 +25,7 @@ const viewPersonal = async (req, res) => {
 // Update Personal Information
 const updatePersonal = async (req, res) => {
     try {
-        const email = req.email;
+        const email = req.headers.email || req.headers.mobile;
         const updateData = req.body;
 
         const applicant = await Applicant.findOneAndUpdate(
