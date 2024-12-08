@@ -5,9 +5,11 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import './Signup.css'; // Importing the CSS file here
+import { useLoading } from './LoadingContext';
 
 const Signup = () => {
 //   const [name, setName] = useState('');
+    const { setLoading } = useLoading();
     const [firstName, setFirstName] = useState(''); // Separate field for first name
     const [lastName, setLastName] = useState(''); // Separate field for last name
     const [email, setEmail] = useState('');
@@ -76,6 +78,7 @@ const Signup = () => {
         // Concatenating First Name and Last Name with a space
         const name = `${firstName.trim()} ${lastName.trim()}`;
         const formData = { name, email, password, role };
+        setLoading(true);
         await fetch(`${API}/user/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -83,6 +86,7 @@ const Signup = () => {
       })
       .then((response) => response.json())
       .then((data) => {
+        setLoading(false);
         if (data.success) {
           Swal.fire({
             title: 'Success!',
@@ -102,6 +106,7 @@ const Signup = () => {
         }
       })
       .catch((error) => {
+        setLoading(false);
         Swal.fire({
           icon: "error",
           title: "Oops...",

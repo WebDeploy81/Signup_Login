@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { API } from '../constant/constant';
+import { useLoading } from './LoadingContext';
+import { useNavigate } from 'react-router-dom';
 
 const OTP_Login = () => {
     const [mobile, setmobile] = useState('');
@@ -7,7 +9,8 @@ const OTP_Login = () => {
     const [isOtpSent, setIsOtpSent] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-
+    const {setLoading}= useLoading();
+    const navigate=useNavigate();
     // Function to send OTP
     const handleSendOtp = async () => {
         if (!mobile || mobile.length !== 10) {
@@ -16,7 +19,7 @@ const OTP_Login = () => {
         }
 
         try {
-            console.log(mobile);
+            setLoading(true);
             const response = await fetch(`${API}/user/otpSend`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -34,6 +37,8 @@ const OTP_Login = () => {
         } catch (error) {
             console.error('Error sending OTP:', error);
             setErrorMessage('Something went wrong. Please try again later.');
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -45,6 +50,7 @@ const OTP_Login = () => {
         }
 
         try {
+            setLoading(true);
             const response = await fetch(`${API}/user/otpVerify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -55,6 +61,7 @@ const OTP_Login = () => {
             if (response.ok) {
                 setSuccessMessage('OTP verified successfully. Redirecting...');
                 setErrorMessage('');
+                navigate("/applicant");
                 // Add your redirection logic here, e.g., navigate to another page
             } else {
                 setErrorMessage(data.message || 'Invalid OTP. Please try again.');
@@ -62,6 +69,8 @@ const OTP_Login = () => {
         } catch (error) {
             console.error('Error verifying OTP:', error);
             setErrorMessage('Something went wrong. Please try again later.');
+        }finally{
+            setLoading(false);
         }
     };
 

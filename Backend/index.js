@@ -1,5 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
+import bodyParser from 'body-parser';
+import mammoth from 'mammoth';
+import fs from 'fs';
+import {JDData} from './modals/JDModel.js';
 import passport from 'passport';
 import userRoute from './router/user.route.js';
 import socialAuthRoute from './router/social.auth.route.js';
@@ -46,7 +51,6 @@ import profile_summery from './router/profile_summery.js';
 import hobbieRoutes from './router/hobbieRoutes.js';
 // const hobbieRoutes = require('./routes/hobbieRoutes');
 import referenceRouter from './router/referenceRouter.js';
-import isAuthenticated from './middlewares/isAuthenticated.js';
 // const referenceRouter = require('./routes/referenceRouter');
 
 // const check_login = require('./middlewares/check-login');
@@ -54,6 +58,8 @@ dotenv.config({});
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const allowedOrigins = [
     process.env.CALLBACK_URL,
   ];
@@ -101,6 +107,104 @@ app.use('/patent', patent);
 app.use('/profile_summery', profile_summery);
 app.use('/hobbie', hobbieRoutes);
 app.use('/reference', referenceRouter);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+const upload = multer({ dest: "uploads/" });
+const parseDocx = async (filePath) => {
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const result = await mammoth.extractRawText({ buffer: fileBuffer });
+    return result.value;
+  } catch (error) {
+    console.error("Error parsing .docx file:", error.message);
+    throw new Error("Error parsing .docx file");
+  }
+};
+const extractJDParameters = (content) => {
+  const getValue = (label) => {
+    const regex = new RegExp(`${label}\\s*[:\\-]\\s*(.+?)\\s*(\\n|$)`, "i");
+    return content.match(regex)?.[1]?.trim() || null;
+  };
+const getList = (label) => {
+  const regex = new RegExp(`${label}\\s*[:\\-]\\s*(.*?)(\\n\\n|$)`, "is");
+  const match = content.match(regex);
+  return match
+    ? match[1]
+        .split(/\n|\●|\-/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+  };
+  return {
+    jobTitle: getValue("JOB TITLE"),
+    noOfVacancies: getValue("NO OF VACANCIES"),
+    collegeCategory: getValue("COLLEGE CATEGORY"),
+    aboutCompany: getValue("ABOUT THE COMPANY"),
+    companyName: getValue("COMPANY NAME"),
+    jobLocation: getValue("JOB LOCATION"),
+    availability: getValue("AVAILABILITY"),
+    salaryRange: getValue("SALARY RANGE"),
+    salaryType: getValue("SALARY TYPE"),
+    essentialQualification: getValue("ESSENTIAL QUALIFICATION"),
+    hardSkills: getList("HARD SKILLS"),
+    softSkills: getList("SOFT SKILLS"),
+    domain: getValue("DOMAIN"),
+    workMode: getValue("WORK MODE"),
+    modeOfEmployment: getValue("MODE OF EMPLOYMENT"),
+    rolesAndResponsibilities: getList("ROLES AND RESPONSIBILITIES"),
+    perksAndBenefits: getList("PERKS AND BENEFITS"),
+    levelOfRole: getValue("LEVEL OF ROLE"),
+    preferredQualification: getValue("PREFERRED/DESIRED QUALIFICATION"),
+    salaryCurrency: getValue("SALARY_CURRENCIES"),
+    overallExperience: getValue("OVERALL EXPERIENCE"),
+    relevantExperience: getValue("RELEVANT EXPERIENCE"),
+    jobDescriptionSummary: getValue("JOB DESCRIPTION SUMMARY"),
+    experienceSkills: getList("EXPERIENCE_SKILLS"),
+    preferredSkills: getList("PREFERRED SKILLS"),
+  };
+}
+app.post("/upload-jd-manual", async (req, res) => {
+  try {
+    console.log("Received payload:", JSON.stringify(req.body, null, 2));
+    const jdData = new JDData(req.body);
+    await jdData.save();
+    res.status(201).json({ success: true, data: jdData });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      console.error("Validation Error:", error.errors);
+      res
+        .status(400)
+        .json({ success: false, error: error.message, details: error.errors });
+    } else {
+      console.error("Upload Error:", error.message);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to upload JD manually." });
+    }
+  }
+});
+app.post("/upload-jd-auto", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, error: "No file uploaded." });
+    }
+    console.log("File received:", req.file);
+    const content = await parseDocx(req.file.path);
+    const extractedData = extractJDParameters(content);
+    console.log("Extracted JD Data:", extractedData);
+    const jdData = new JDData(extractedData);
+    await jdData.save();
+    fs.unlinkSync(req.file.path); // Clean up the uploaded file
+    res.status(201).json({ success: true, data: jdData });
+  } catch (error) {
+    console.error("Automatic Upload Error:", error.message);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to upload JD automatically." });
+  }
+});
 const PORT=process.env.PORT || 8000;
 app.listen(PORT,()=>{
     connetDB();

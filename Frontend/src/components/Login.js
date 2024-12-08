@@ -5,6 +5,7 @@ import { API } from '../constant/constant';
 import { FaGoogle, FaFacebook, FaLinkedin } from 'react-icons/fa'; // Import icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { useLoading } from './LoadingContext';
 
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
-
+    const { setLoading } = useLoading();
 
     const navigate=useNavigate();
     // Regular expression for email validation
@@ -20,7 +21,6 @@ const Login = () => {
 
     const validateForm = () => {
         let errors = {};
-
         if (!email) {
             errors.email = "Email is required";
         } else if (!emailRegex.test(email)) {
@@ -40,6 +40,7 @@ const Login = () => {
         event.preventDefault();
         if (validateForm()) {
             console.log({ email, password });
+            setLoading(true);
             await fetch(`${API}/user/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,10 +48,11 @@ const Login = () => {
             })
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
+                // console.log(data);
                 window.localStorage.setItem('token',data.token);
                 localStorage.setItem('email',data.email);
                 localStorage.setItem('mobile',data.mobile);
+                setLoading(false);
                 if (data.success) {
                     if(data.role==='1'){
                         navigate("/admin");
@@ -67,6 +69,7 @@ const Login = () => {
             })
             .catch((error) => {
                 console.error('Error:', error);
+                setLoading(false);
             });
             // Insert API call here
         }

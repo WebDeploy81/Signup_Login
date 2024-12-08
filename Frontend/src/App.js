@@ -7,9 +7,11 @@ import RecruiterDashboard from './components/RecruiterDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import OTP_Login from './components/OTP_Login';
 import Applicant from './Applicant/Applicant';
+import Spinner from './components/Spinner';
 function App() {
   return (
     <Router>
+      <Spinner/>
       <Routes>
         {/* <h1> CU Recruitment Portal </h1> */}
         <Route path = "/" element={<Login />} />
