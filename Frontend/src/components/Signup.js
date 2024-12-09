@@ -245,7 +245,6 @@ const Signup = () => {
                       {/* {showPassword ? "🙈" : "👁️"} */}
                       <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                     </span>
-                    
                     {/* Hover Card */}
                     
                      {/* {showHoverCard && (
@@ -269,8 +268,8 @@ const Signup = () => {
                         </ul>
                       </div> 
                     )}  */}
-                    {/* Hover Card */}
-                    {showHoverCard && (
+                   
+                    {/* {showHoverCard && (
                       <div className="hover-card">
                         <span className={passwordRequirements.minLength ? "green" : "red"}>
                           <span className="icon">{passwordRequirements.minLength ? "✅" : "❌"}</span>
@@ -293,7 +292,7 @@ const Signup = () => {
                           At least 1 special character
                         </span>
                       </div>
-                    )}
+                    )} */}
 
                     
 
